@@ -77,15 +77,15 @@
   }
 
   .logo {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: 'Go3v2', 'Rajdhani', sans-serif;
     font-size: 22px;
-    font-weight: 700;
+    font-weight: normal;
     background: var(--accent);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     white-space: nowrap;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
   }
 
   .logo span {
@@ -1289,21 +1289,21 @@ const DUNGEONS_KEY = 'kpt_dungeons';
 const PASSEURS_KEY = 'kpt_passeurs';
 
 const DEFAULT_DUNGEONS = [
-  { id: 'd1',  name: 'Cire Momore',         boss: 'Cire Momore',         level: 200, category: 'Mondes Miroir',    difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd2',  name: 'Koutoulou',           boss: 'Koutoulou',           level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd3',  name: 'Ilyzaelle',           boss: 'Ilyzaelle',           level: 200, category: 'Ilyzaelle',        difficulty: 'Extrême',   imageUrl: '', imageZoom: 1.10 },
-  { id: 'd4',  name: 'Solar',               boss: 'Solar',               level: 200, category: 'Dofus Turquoise',  difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd5',  name: 'Dantinéa',            boss: 'Dantinéa',            level: 200, category: 'Dofus Turquoise',  difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd6',  name: 'Tal Kasha',           boss: 'Tal Kasha',           level: 200, category: 'Dofus Émeraude',   difficulty: 'Extrême',   imageUrl: '', imageZoom: 1.10 },
-  { id: 'd7',  name: 'Merkator',            boss: 'Merkator',            level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd8',  name: 'Comte Harebourg',     boss: 'Comte Harebourg',     level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd9',  name: 'Klime',               boss: 'Klime le Glacieur',   level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd10', name: 'Missiz Frizz',        boss: 'Missiz Frizz',        level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd11', name: 'Nileza',              boss: 'Nileza',              level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd12', name: 'Sylargh',             boss: 'Sylargh',             level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd13', name: 'Vortex',              boss: 'Vortex',              level: 200, category: 'Vortex',           difficulty: 'Extrême',   imageUrl: '', imageZoom: 1.10 },
-  { id: 'd14', name: 'Reine des Voleurs',   boss: 'Reine des Voleurs',   level: 200, category: 'Pandore',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd15', name: 'Roi Nidas',           boss: 'Roi Nidas',           level: 200, category: 'Pandore',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
+  { id: 'd1',  name: 'Cire Momore',         boss: 'Cire Momore',         level: 200, category: 'Mondes Miroir',    difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/7222_Cire_Momore_1773313064629.webp', imageZoom: 1.15 },
+  { id: 'd2',  name: 'Koutoulou',           boss: 'Koutoulou',           level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/4453_Larve_de_Koutoulou_1773307512094.webp', imageZoom: 1.15 },
+  { id: 'd3',  name: 'Ilyzaelle',           boss: 'Ilyzaelle',           level: 200, category: 'Ilyzaelle',        difficulty: 'Extrême',   imageUrl: 'https://dofusyelle.com/images/4967_Ilyzaelle_1773308474352.webp', imageZoom: 1.15 },
+  { id: 'd4',  name: 'Solar',               boss: 'Solar',               level: 200, category: 'Dofus Turquoise',  difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/5100_Solar_1773308647554.webp', imageZoom: 1.15 },
+  { id: 'd5',  name: 'Dantinéa',            boss: 'Dantinéa',            level: 200, category: 'Dofus Turquoise',  difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/4444_Dantinea_1773307921010.webp', imageZoom: 1.15 },
+  { id: 'd6',  name: 'Tal Kasha',           boss: 'Tal Kasha',           level: 200, category: 'Dofus Émeraude',   difficulty: 'Extrême',   imageUrl: 'https://dofusyelle.com/images/4744_Tal_Kasha_1773308090697.webp', imageZoom: 1.15 },
+  { id: 'd7',  name: 'Merkator',            boss: 'Merkator',            level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3534_Merkator_1773305611332.webp', imageZoom: 1.15 },
+  { id: 'd8',  name: 'Comte Harebourg',     boss: 'Comte Harebourg',     level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3416_Comte_Harebourg_1773304889715.webp', imageZoom: 1.15 },
+  { id: 'd9',  name: 'Klime',               boss: 'Klime le Glacieur',   level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3384_Klime_1773304214717.webp', imageZoom: 1.15 },
+  { id: 'd10', name: 'Missiz Frizz',        boss: 'Missiz Frizz',        level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3391_Missiz_Frizz_1773303956398.webp', imageZoom: 1.15 },
+  { id: 'd11', name: 'Nileza',              boss: 'Nileza',              level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3397_Nileza_1773304486799.webp', imageZoom: 1.15},
+  { id: 'd12', name: 'Sylargh',             boss: 'Sylargh',             level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3409_Sylargh_1773304083076.webp', imageZoom: 1.15 },
+  { id: 'd13', name: 'Vortex',              boss: 'Vortex',              level: 200, category: 'Vortex',           difficulty: 'Extrême',   imageUrl: 'https://dofusyelle.com/images/3835_Vortex_1773306762313.webp', imageZoom: 1.15 },
+  { id: 'd14', name: 'Reine des Voleurs',   boss: 'Reine des Voleurs',   level: 200, category: 'Pandore',          difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3726_Reine_des_Voleurs_1773305984070.webp', imageZoom: 1.15 },
+  { id: 'd15', name: 'Roi Nidas',           boss: 'Roi Nidas',           level: 200, category: 'Pandore',          difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3648_Roi_Nidas_1773305704035.webp', imageZoom: 1.15 },
   { id: 'd16', name: 'Chalœil',             boss: 'Chalœil',             level: 200, category: 'Pandore',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
   { id: 'd17', name: 'Protozorreur',        boss: 'Protozorreur',        level: 200, category: 'Pandore',          difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
   { id: 'd18', name: 'Belladone',           boss: 'Belladone',           level: 200, category: 'Pandore',          difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
@@ -1313,7 +1313,7 @@ const DEFAULT_DUNGEONS = [
   { id: 'd22', name: 'Guerre',              boss: 'Guerre',              level: 200, category: 'Abysses',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
   { id: 'd23', name: 'Misère',              boss: 'Misère',              level: 200, category: 'Abysses',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
   { id: 'd24', name: 'Corruption',          boss: 'Corruption',          level: 200, category: 'Abysses',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
-  { id: 'd25', name: 'Anerice',             boss: 'Anerice',             level: 200, category: 'Pandore',          difficulty: 'Moyen',     imageUrl: 'https://jolstatic.fr/dofus/Modules/Articles/images/monsters/4882.png', imageZoom: 1.5 },
+  { id: 'd25', name: 'Anerice',             boss: 'Anerice',             level: 200, category: 'Pandore',          difficulty: 'Moyen',     imageUrl: 'https://jolstatic.fr/dofus/Modules/Articles/images/monsters/4882.png', imageZoom: 1.15 },
   { id: 'd26', name: 'Bethel',              boss: 'Bethel',              level: 200, category: 'Pandore',          difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
   { id: 'd27', name: 'Meno',                boss: 'Meno',                level: 200, category: 'Meno',             difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
   { id: 'd28', name: 'Capitaine Meno',      boss: 'Capitaine Meno',      level: 200, category: 'Meno',             difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
@@ -1530,7 +1530,7 @@ function renderRow(row) {
       return getPriceClass(p.price, mn);
     })()) : 'price-empty';
 
-    const crown = isCheapest ? '👑 ' : '';
+    const crown = isCheapest ? '🪙 ' : '';
     priceCell = p.price
       ? `<span class="price-cell ${priceClassActual}">${crown}${formatKamas(p.price)}</span>`
       : `<span class="price-cell price-empty">Non renseigné</span>`;
