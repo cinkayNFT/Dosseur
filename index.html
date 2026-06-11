@@ -1,0 +1,2578 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kourial Passeur Tracker</title>
+<!-- FontAwesome for gaming & media icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+@font-face {
+  font-family: 'Go3v2';
+  src: url('./fonts/Go3v2.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg-deep: #0a0c12;
+    --bg-card: #111420;
+    --bg-card2: #161926;
+    --bg-input: #1a1e2e;
+    --border: #252a3d;
+    --border-bright: #2e3554;
+    --accent: #4f6ef7;
+    --accent2: #7c5af7;
+    --accent-glow: rgba(79,110,247,0.18);
+    --green: #2ecc71;
+    --green-dark: #1a7a44;
+    --green-bg: rgba(46,204,113,0.10);
+    --orange: #f39c12;
+    --orange-bg: rgba(243,156,18,0.10);
+    --red: #e74c3c;
+    --red-bg: rgba(231,76,60,0.10);
+    --text: #e8eaf6;
+    --text-dim: #8892b0;
+    --text-muted: #4a526e;
+    --gold: #f0c040;
+    --diff-easy: #2ecc71;
+    --diff-medium: #f39c12;
+    --diff-hard: #e74c3c;
+    --diff-extreme: #9b59b6;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.5);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    padding-bottom: 95px; /* Offset to prevent overlap with the fixed music footer player */
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0f1220 0%, #14192e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 60px;
+  }
+
+  .logo {
+    font-family: 'Go3v2', 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: normal;
+    background: var(--accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    white-space: nowrap;
+    letter-spacing: 1px;
+  }
+
+  .logo span {
+    -webkit-text-fill-color: var(--gold);
+    background: none;
+    font-size: 22px;
+  }
+
+  .header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-secondary { background: var(--bg-card2); color: var(--text); border: 1px solid var(--border-bright); }
+  .btn-success { background: var(--green-dark); color: var(--accent); border: 1px solid rgba(46,204,113,0.3); }
+  .btn-danger { background: rgba(231,76,60,0.15); color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
+  .btn-warning { background: rgba(243,156,18,0.15); color: var(--orange); border: 1px solid rgba(243,156,18,0.3); }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn-icon { padding: 6px 8px; }
+
+  /* MAIN */
+  main { padding: 20px 24px; max-width: 1600px; margin: 0 auto; }
+
+  /* DASHBOARD */
+  .dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-value.green { color: var(--accent); }
+  .stat-value.gold { color: var(--gold); }
+
+  .stat-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* CONTROLS */
+  .controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  input[type=text], input[type=number], select, textarea {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+
+  input[type=text]:focus, input[type=number]:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 9px 12px 9px 36px;
+  }
+
+  select {
+    padding: 9px 12px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238892b0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+  }
+
+  thead {
+    background: var(--bg-card2);
+    border-bottom: 1px solid var(--border-bright);
+  }
+
+  th {
+    padding: 11px 14px;
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-dim);
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  th:hover { color: var(--text); }
+  th.sorted { color: var(--accent); }
+  th .sort-icon { margin-left: 4px; opacity: 0.5; }
+  th.sorted .sort-icon { opacity: 1; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(79,110,247,0.04); }
+
+  tbody tr.cheapest-row { background: rgba(46,204,113,0.04); }
+  tbody tr.cheapest-row:hover { background: rgba(46,204,113,0.08); }
+
+  td {
+    padding: 10px 14px;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .td-dungeon { font-weight: 600; color: var(--text); }
+  .td-boss { color: var(--text-dim); font-size: 12px; }
+  .td-level {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--accent);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .diff-easy { background: rgba(46,204,113,0.15); color: var(--diff-easy); }
+  .diff-medium { background: rgba(243,156,18,0.15); color: var(--diff-medium); }
+  .diff-hard { background: rgba(231,76,60,0.15); color: var(--diff-hard); }
+  .diff-extreme { background: rgba(155,89,182,0.15); color: var(--diff-extreme); }
+
+  .cat-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    background: var(--bg-input);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+
+  .td-pseudo { font-weight: 500; }
+
+  .price-cell {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .price-cheapest { color: var(--accent); }
+  .price-cheap { color: #85c1a0; }
+  .price-mid { color: var(--orange); }
+  .price-expensive { color: var(--red); }
+  .price-empty { color: var(--text-muted); font-size: 12px; font-family: 'Inter'; font-weight: 400; }
+
+  .cheapest-crown {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .td-notes {
+    max-width: 180px;
+    color: var(--text-dim);
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .td-date { color: var(--text-muted); font-size: 11px; white-space: nowrap; }
+
+  .actions-cell { white-space: nowrap; }
+
+  .empty-row td {
+    text-align: center;
+    padding: 18px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .empty-row td .empty-add {
+    color: var(--accent);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border-bright);
+    border-radius: 14px;
+    padding: 28px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+    transform: translateY(20px);
+    transition: transform 0.2s;
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .form-grid .full { grid-column: 1 / -1; }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .form-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-dim);
+    font-weight: 600;
+  }
+
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 9px 12px;
+    width: 100%;
+  }
+
+  textarea { resize: vertical; min-height: 70px; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+    justify-content: flex-end;
+  }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .count-badge {
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+  }
+
+  /* TOAST */
+  .toast-container {
+    position: fixed;
+    bottom: 95px; /* Offset to stay above player */
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .toast {
+    background: var(--bg-card2);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 13px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: toastIn 0.2s ease;
+    max-width: 300px;
+  }
+
+  .toast.success { border-left: 3px solid var(--accent); }
+  .toast.error { border-left: 3px solid var(--red); }
+  .toast.info { border-left: 3px solid var(--accent); }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* IMPORT AREA */
+  .import-area {
+    border: 2px dashed var(--border-bright);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 12px;
+  }
+  .import-area:hover { border-color: var(--accent); color: var(--text); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-muted);
+  }
+  .empty-state svg { margin-bottom: 12px; opacity: 0.3; }
+  .empty-state h3 { font-family: 'Rajdhani'; font-size: 22px; color: var(--text-dim); margin-bottom: 6px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    main { padding: 14px; }
+    header { padding: 0 14px; }
+    .logo { font-size: 22px; }
+    .header-actions .btn span { display: none; }
+    .dashboard { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid .full { grid-column: 1; }
+    .controls { gap: 8px; }
+    .search-wrap { min-width: 100%; }
+    body { padding-bottom: 110px; }
+  }
+
+  @media (max-width: 480px) {
+    .dashboard { grid-template-columns: 1fr 1fr; }
+    .stat-value { font-size: 22px; }
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 16px 0;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    margin-bottom: 16px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 7px 12px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dim);
+    transition: all 0.15s;
+  }
+
+  .tab.active {
+    background: var(--bg-card);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  /* PREMIUM FIXED FOOTER MUSIC PLAYER STYLES */
+  .player-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 75px;
+    background: rgba(17, 20, 32, 0.95);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border-bright);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 999;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.6);
+  }
+  
+  .player-track-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 25%;
+    min-width: 180px;
+  }
+  
+  .player-disk {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--bg-deep);
+    border: 1px solid var(--border-bright);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    transition: all 0.5s ease;
+  }
+  
+  .player-disk.playing {
+    animation: spin 3.5s linear infinite;
+    box-shadow: 0 0 12px rgba(79, 110, 247, 0.35);
+    border-color: var(--accent);
+  }
+  
+  @keyframes spin {
+    100% { transform: rotate(360deg); }
+  }
+  
+  .player-track-details {
+    overflow: hidden;
+  }
+  
+  .player-track-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .player-track-artist {
+    font-size: 10px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+  
+  .player-controls-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 50%;
+  }
+  
+  .player-buttons {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .player-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    outline: none;
+  }
+  
+  .player-btn:hover {
+    color: var(--text);
+    transform: scale(1.08);
+  }
+  
+  .player-btn.active {
+    color: var(--accent);
+    text-shadow: 0 0 8px rgba(79, 110, 247, 0.5);
+  }
+  
+  .player-btn-play {
+    background: var(--accent);
+    color: var(--bg-deep) !important;
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
+    box-shadow: 0 0 12px rgba(79, 110, 247, 0.4);
+  }
+  
+  .player-btn-play:hover {
+    transform: scale(1.1);
+    filter: brightness(1.15);
+  }
+  
+  .player-timeline-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 500px;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+  }
+  
+  .player-timeline {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .player-timeline-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    width: 0;
+  }
+  
+  .player-right-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 25%;
+    justify-content: flex-end;
+    min-width: 180px;
+  }
+  
+  .player-volume-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .player-volume-slider {
+    -webkit-appearance: none;
+    width: 70px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  
+  .player-volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  
+  .player-volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+
+  /* PLAYLIST DROPDOWN */
+  .playlist-modal {
+    position: fixed;
+    bottom: 85px;
+    right: 24px;
+    width: 340px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    z-index: 1001;
+    overflow: hidden;
+    display: none;
+    font-family: 'Inter', sans-serif;
+    animation: slideUp 0.2s ease;
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(15px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  .playlist-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-card2);
+  }
+  
+  .playlist-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .playlist-search-container {
+    padding: 10px 14px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .playlist-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-input);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .playlist-search-input:focus {
+    border-color: var(--accent);
+  }
+  
+  .playlist-body {
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 8px;
+  }
+  
+  .playlist-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    margin-bottom: 4px;
+  }
+  
+  .playlist-item:hover {
+    background: rgba(79, 110, 247, 0.05);
+    border-color: rgba(79, 110, 247, 0.1);
+  }
+  
+  .playlist-item.active {
+    background: rgba(79, 110, 247, 0.1);
+    border-color: rgba(79, 110, 247, 0.3);
+  }
+  
+  .playlist-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+  }
+  
+  .playlist-item-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .playlist-item-artist {
+    font-size: 10px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .playlist-item-icon {
+    color: var(--accent);
+    font-size: 11px;
+  }
+
+  /* RESPONSIVE PLAYER CONFIG */
+  @media (max-width: 768px) {
+    .player-footer {
+      padding: 0 12px;
+      height: 70px;
+    }
+    .player-track-info {
+      width: auto;
+      min-width: 110px;
+      gap: 8px;
+    }
+    .player-disk {
+      width: 34px;
+      height: 34px;
+    }
+    .player-track-details {
+      display: none; /* Hide metadata text on tiny viewports */
+    }
+    .player-right-controls {
+      width: auto;
+      min-width: auto;
+      gap: 8px;
+    }
+    .player-volume-container {
+      display: none; /* Mobile volume hidden */
+    }
+    .player-timeline-container {
+      max-width: 100%;
+      font-size: 10px;
+    }
+    .player-controls-container {
+      width: 70%;
+    }
+    .playlist-modal {
+      width: calc(100% - 24px);
+      right: 12px;
+      bottom: 80px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span>Kourial </span><span>⚔</span> Passeurs</div>
+  <div class="header-actions">
+    <button class="btn btn-secondary" onclick="openImportModal()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Importer</span>
+    </button>
+    <button class="btn btn-secondary" onclick="exportJSON()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span>JSON</span>
+    </button>
+    <button class="btn btn-secondary" onclick="exportCSV()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>CSV</span>
+    </button>
+    <button class="btn btn-primary" onclick="openPasseurModal()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Ajouter Passeur</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- DASHBOARD -->
+  <div class="dashboard">
+    <div class="stat-card">
+      <div class="stat-label">Donjons</div>
+      <div class="stat-value" id="stat-dungeons">0</div>
+      <div class="stat-sub">enregistrés</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Passeurs</div>
+      <div class="stat-value gold" id="stat-passeurs">0</div>
+      <div class="stat-sub">au total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Prix le plus bas</div>
+      <div class="stat-value green" id="stat-cheapest">—</div>
+      <div class="stat-sub" id="stat-cheapest-dungeon">aucun</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Dernière mise à jour</div>
+      <div class="stat-value" style="font-size:18px" id="stat-lastupdate">—</div>
+      <div class="stat-sub" id="stat-lastupdate-who">—</div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Donjon, boss, passeur, notes..." oninput="renderTable()">
+    </div>
+    <select id="filterDifficulty" onchange="renderTable()">
+      <option value="">Toutes difficultés</option>
+      <option value="Facile">Facile</option>
+      <option value="Moyen">Moyen</option>
+      <option value="Difficile">Difficile</option>
+      <option value="Extrême">Extrême</option>
+    </select>
+    <select id="filterCategory" onchange="renderTable()">
+      <option value="">Toutes catégories</option>
+    </select>
+    <select id="sortBy" onchange="renderTable()">
+      <option value="dungeon">Trier: Donjon</option>
+      <option value="price_asc">Prix: Croissant</option>
+      <option value="price_desc">Prix: Décroissant</option>
+      <option value="level">Niveau</option>
+    </select>
+    <button class="btn btn-secondary btn-sm" onclick="resetFilters()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+    </button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="section-header">
+    <div class="section-title">Passeurs</div>
+    <div class="count-badge" id="tableCount">0 entrées</div>
+    <div style="margin-left:auto; display:flex; gap:8px;">
+      <button class="btn btn-secondary btn-sm" onclick="openDungeonModal()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Donjon
+      </button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th onclick="setSort('dungeon')">Donjon <span class="sort-icon">↕</span></th>
+          <th onclick="setSort('boss')">Boss <span class="sort-icon">↕</span></th>
+          <th onclick="setSort('level')">Lvl <span class="sort-icon">↕</span></th>
+          <th>Catégorie</th>
+          <th onclick="setSort('difficulty')">Difficulté <span class="sort-icon">↕</span></th>
+          <th onclick="setSort('pseudo')">Pseudo <span class="sort-icon">↕</span></th>
+          <th onclick="setSort('price_asc')">Prix <span class="sort-icon">↕</span></th>
+          <th>Notes</th>
+          <th onclick="setSort('updated')">MàJ <span class="sort-icon">↕</span></th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- PASSEUR MODAL -->
+<div class="modal-overlay" id="passeurModal">
+  <div class="modal">
+    <div class="modal-title">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span id="passeurModalTitle">Ajouter un Passeur</span>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Donjon</label>
+        <select id="pDungeon" onchange="fillBossFromDungeon()">
+          <option value="">Sélectionner un donjon...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pseudo du Passeur</label>
+        <input type="text" id="pPseudo" placeholder="ex: Dragoone">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Prix (kamas)</label>
+        <input type="number" id="pPrice" placeholder="ex: 500000" min="0">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Notes</label>
+        <textarea id="pNotes" placeholder="Disponibilités, conditions, contact..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('passeurModal')">Annuler</button>
+      <button class="btn btn-primary" onclick="savePasseur()">Sauvegarder</button>
+    </div>
+    <input type="hidden" id="pEditId">
+  </div>
+</div>
+
+<!-- DUNGEON MODAL -->
+<div class="modal-overlay" id="dungeonModal">
+  <div class="modal">
+    <div class="modal-title">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span id="dungeonModalTitle">Ajouter un Donjon</span>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Nom du Donjon</label>
+        <input type="text" id="dName" placeholder="ex: Cire Momore">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Nom du Boss</label>
+        <input type="text" id="dBoss" placeholder="ex: Cire Momore">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Niveau</label>
+        <input type="number" id="dLevel" placeholder="200" min="1" max="230">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catégorie</label>
+        <input type="text" id="dCategory" placeholder="ex: Temporis, Iop...">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Difficulté</label>
+        <select id="dDifficulty">
+          <option value="Facile">Facile</option>
+          <option value="Moyen">Moyen</option>
+          <option value="Difficile" selected>Difficile</option>
+          <option value="Extrême">Extrême</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Image du Boss — URL (optionnel)</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="text" id="dImageUrl" placeholder="https://... ou chemin local" oninput="previewBossImage()" style="flex:1;">
+          <div id="dImagePreview" style="width:42px;height:42px;border-radius:8px;background:var(--bg-input);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:0.3;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Colle l'URL de l'image depuis le wiki Dofus (clic droit → copier l'adresse de l'image)</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('dungeonModal')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveDungeon()">Sauvegarder</button>
+    </div>
+    <input type="hidden" id="dEditId">
+  </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal">
+    <div class="modal-title">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Importer des données
+    </div>
+    <div class="tabs">
+      <div class="tab active" id="tabJson" onclick="switchImportTab('json')">JSON</div>
+      <div class="tab" id="tabFile" onclick="switchImportTab('file')">Fichier</div>
+    </div>
+    <div id="importJsonSection">
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="form-label">Coller le JSON</label>
+        <textarea id="importJsonText" style="padding:10px;width:100%;min-height:120px;font-size:12px;" placeholder='{"dungeons":[...],"passeurs":[...]}'></textarea>
+      </div>
+    </div>
+    <div id="importFileSection" style="display:none;">
+      <div class="import-area" onclick="document.getElementById('importFile').click()">
+        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 8px;display:block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Cliquer pour choisir un fichier JSON
+      </div>
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="loadImportFile(event)">
+      <div id="importFileName" style="font-size:12px;color:var(--text-dim);margin-top:6px;"></div>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:8px;">
+      ⚠️ L'import remplacera les données existantes.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('importModal')">Annuler</button>
+      <button class="btn btn-primary" onclick="doImport()">Importer</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-title" style="color:var(--red);">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Confirmer la suppression
+    </div>
+    <p id="confirmText" style="color:var(--text-dim);font-size:14px;margin-bottom:20px;"></p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Annuler</button>
+      <button class="btn btn-danger" id="confirmBtn">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIXED FOOTER MUSIC PLAYER -->
+<footer class="player-footer">
+  <!-- Track details -->
+  <div class="player-track-info">
+    <div id="player-disk" class="player-disk">
+      <i id="player-icon" class="fa-solid fa-compact-disc text-xl"></i>
+    </div>
+    <div class="player-track-details">
+      <h4 id="now-playing-title" class="player-track-title">Aucun son chargé</h4>
+      <p id="now-playing-artist" class="player-track-artist">Initialisation...</p>
+    </div>
+  </div>
+
+  <!-- Playback Controls and Progress -->
+  <div class="player-controls-container">
+    <div class="player-buttons">
+      <!-- Shuffle Button -->
+      <button id="player-shuffle" class="player-btn" title="Lecture aléatoire">
+        <i class="fa-solid fa-shuffle"></i>
+      </button>
+
+      <!-- Prev Button -->
+      <button id="player-prev" class="player-btn" title="Précédent">
+        <i class="fa-solid fa-backward-step"></i>
+      </button>
+      
+      <!-- Play / Pause -->
+      <button id="player-play-btn" class="player-btn player-btn-play" title="Lecture/Pause">
+        <i id="play-btn-icon" class="fa-solid fa-play" style="margin-left: 2px;"></i>
+      </button>
+      
+      <!-- Next Button -->
+      <button id="player-next" class="player-btn" title="Suivant">
+        <i class="fa-solid fa-forward-step"></i>
+      </button>
+      
+      <!-- Repeat Toggle -->
+      <button id="player-loop" class="player-btn" title="Répéter">
+        <i class="fa-solid fa-repeat"></i>
+      </button>
+    </div>
+
+    <!-- Timeline Timeline Timeline -->
+    <div class="player-timeline-container">
+      <span id="player-time-current">0:00</span>
+      <div id="player-timeline" class="player-timeline">
+        <div id="player-timeline-progress" class="player-timeline-progress"></div>
+      </div>
+      <span id="player-time-duration">0:00</span>
+    </div>
+  </div>
+
+  <!-- Volume & Playlist Toggles -->
+  <div class="player-right-controls">
+    <!-- Volume Slider Container -->
+    <div class="player-volume-container">
+      <button id="player-mute" class="player-btn" style="width:20px;height:20px;font-size:12px;" title="Couper le son">
+        <i id="player-mute-icon" class="fa-solid fa-volume-high"></i>
+      </button>
+      <input id="player-volume-slider" class="player-volume-slider" type="range" min="0" max="1" step="0.05" value="0.6">
+    </div>
+
+    <!-- Playlist Button -->
+    <button id="open-playlist-btn" class="btn btn-secondary btn-sm" style="padding: 6px 12px; gap: 6px;">
+      <i class="fa-solid fa-list-ul" style="color: var(--accent);"></i>
+      <span>Playlist</span>
+    </button>
+  </div>
+</footer>
+
+<!-- PLAYLIST POPUP MODAL -->
+<div id="playlist-modal" class="playlist-modal">
+  <div class="playlist-header">
+    <div class="playlist-title">
+      <i class="fa-solid fa-compact-disc" style="color: var(--accent);"></i>
+      <span>Playlist OST Dofus</span>
+    </div>
+    <button id="close-playlist-btn" class="player-btn" style="width: 24px; height: 24px; font-size: 14px;">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+  <!-- Search bar inside the Playlist -->
+  <div class="playlist-search-container">
+    <input type="text" id="playlist-search" class="playlist-search-input" placeholder="Rechercher une piste...">
+  </div>
+  <div id="playlist-container" class="playlist-body">
+    <!-- Tracks will be dynamically injected here -->
+  </div>
+</div>
+
+<!-- Background Audio Element -->
+<audio id="main-audio"></audio>
+
+<script>
+// ===================== DATA LAYER =====================
+
+const DUNGEONS_KEY = 'kpt_dungeons';
+const PASSEURS_KEY = 'kpt_passeurs';
+
+const DEFAULT_DUNGEONS = [
+  { id: 'd1',  name: 'Cire Momore',         boss: 'Cire Momore',         level: 200, category: 'Mondes Miroir',    difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/7222_Cire_Momore_1773313064629.webp', imageZoom: 1.15 },
+  { id: 'd2',  name: 'Koutoulou',           boss: 'Koutoulou',           level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/4453_Larve_de_Koutoulou_1773307512094.webp', imageZoom: 1.15 },
+  { id: 'd3',  name: 'Ilyzaelle',           boss: 'Ilyzaelle',           level: 200, category: 'Ilyzaelle',        difficulty: 'Extrême',   imageUrl: 'https://dofusyelle.com/images/4967_Ilyzaelle_1773308474352.webp', imageZoom: 1.15 },
+  { id: 'd4',  name: 'Solar',               boss: 'Solar',               level: 200, category: 'Dofus Turquoise',  difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/5100_Solar_1773308647554.webp', imageZoom: 1.15 },
+  { id: 'd5',  name: 'Dantinéa',            boss: 'Dantinéa',            level: 200, category: 'Dofus Turquoise',  difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/4444_Dantinea_1773307921010.webp', imageZoom: 1.15 },
+  { id: 'd6',  name: 'Tal Kasha',           boss: 'Tal Kasha',           level: 200, category: 'Dofus Émeraude',   difficulty: 'Extrême',   imageUrl: 'https://dofusyelle.com/images/4744_Tal_Kasha_1773308090697.webp', imageZoom: 1.15 },
+  { id: 'd7',  name: 'Merkator',            boss: 'Merkator',            level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3534_Merkator_1773305611332.webp', imageZoom: 1.15 },
+  { id: 'd8',  name: 'Comte Harebourg',     boss: 'Comte Harebourg',     level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3416_Comte_Harebourg_1773304889715.webp', imageZoom: 1.15 },
+  { id: 'd9',  name: 'Klime',               boss: 'Klime le Glacieur',   level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3384_Klime_1773304214717.webp', imageZoom: 1.15 },
+  { id: 'd10', name: 'Missiz Frizz',        boss: 'Missiz Frizz',        level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3391_Missiz_Frizz_1773303956398.webp', imageZoom: 1.15 },
+  { id: 'd11', name: 'Nileza',              boss: 'Nileza',              level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3397_Nileza_1773304486799.webp', imageZoom: 1.15},
+  { id: 'd12', name: 'Sylargh',             boss: 'Sylargh',             level: 200, category: 'Frigost III',      difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3409_Sylargh_1773304083076.webp', imageZoom: 1.15 },
+  { id: 'd13', name: 'Vortex',              boss: 'Vortex',              level: 200, category: 'Vortex',           difficulty: 'Extrême',   imageUrl: 'https://dofusyelle.com/images/3835_Vortex_1773306762313.webp', imageZoom: 1.15 },
+  { id: 'd14', name: 'Reine des Voleurs',   boss: 'Reine des Voleurs',   level: 200, category: 'Pandore',          difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3726_Reine_des_Voleurs_1773305984070.webp', imageZoom: 1.15 },
+  { id: 'd15', name: 'Roi Nidas',           boss: 'Roi Nidas',           level: 200, category: 'Pandore',          difficulty: 'Difficile', imageUrl: 'https://dofusyelle.com/images/3648_Roi_Nidas_1773305704035.webp', imageZoom: 1.15 },
+  { id: 'd16', name: 'Chalœil',             boss: 'Chalœil',             level: 200, category: 'Pandore',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
+  { id: 'd17', name: 'Protozorreur',        boss: 'Protozorreur',        level: 200, category: 'Pandore',          difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
+  { id: 'd18', name: 'Belladone',           boss: 'Belladone',           level: 200, category: 'Pandore',          difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
+  { id: 'd19', name: 'Kabahal',             boss: 'Kabahal',             level: 200, category: 'Frigost I',        difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
+  { id: 'd20', name: 'Eternal Conflict',    boss: 'Eternal Conflict',    level: 200, category: 'Eternal Conflict', difficulty: 'Extrême',   imageUrl: '', imageZoom: 1.10 },
+  { id: 'd21', name: 'Servitude',           boss: 'Servitude',           level: 200, category: 'Abysses',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
+  { id: 'd22', name: 'Guerre',              boss: 'Guerre',              level: 200, category: 'Abysses',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
+  { id: 'd23', name: 'Misère',              boss: 'Misère',              level: 200, category: 'Abysses',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
+  { id: 'd24', name: 'Corruption',          boss: 'Corruption',          level: 200, category: 'Abysses',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
+  { id: 'd25', name: 'Anerice',             boss: 'Anerice',             level: 200, category: 'Pandore',          difficulty: 'Moyen',     imageUrl: 'https://jolstatic.fr/dofus/Modules/Articles/images/monsters/4882.png', imageZoom: 1.15 },
+  { id: 'd26', name: 'Bethel',              boss: 'Bethel',              level: 200, category: 'Pandore',          difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
+  { id: 'd27', name: 'Meno',                boss: 'Meno',                level: 200, category: 'Meno',             difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
+  { id: 'd28', name: 'Capitaine Meno',      boss: 'Capitaine Meno',      level: 200, category: 'Meno',             difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
+  { id: 'd29', name: 'Torkélonia',          boss: 'Torkélonia',          level: 200, category: 'Frigost I',        difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
+  { id: 'd30', name: 'Toxoliath',           boss: 'Toxoliath',           level: 200, category: 'Frigost I',        difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
+  { id: 'd31', name: 'Kanigroula',          boss: 'Kanigroula',          level: 200, category: 'Frigost I',        difficulty: 'Facile',    imageUrl: '', imageZoom: 1.10 },
+  { id: 'd32', name: 'Ombre',               boss: 'Ombre',               level: 200, category: 'Ombre',            difficulty: 'Extrême',   imageUrl: '', imageZoom: 1.10 },
+  { id: 'd33', name: 'Nidas',               boss: 'Nidas',               level: 200, category: 'Pandore',          difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
+  { id: 'd34', name: 'Ush',                 boss: 'Ush',                 level: 200, category: 'Abysses',          difficulty: 'Extrême',   imageUrl: '', imageZoom: 1.10 },
+  { id: 'd35', name: 'XLII',                boss: 'XLII',                level: 200, category: 'Temporis',         difficulty: 'Extrême',   imageUrl: '', imageZoom: 1.10 },
+  { id: 'd36', name: 'Capitaine Ekarlatte', boss: 'Capitaine Ekarlatte', level: 200, category: 'Île de Moon',      difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
+  { id: 'd37', name: 'Dramak',              boss: 'Dramak',              level: 200, category: 'Monde des Douze',  difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
+  { id: 'd38', name: 'Père Ver',            boss: 'Père Ver',            level: 200, category: 'Pandore',          difficulty: 'Moyen',     imageUrl: '', imageZoom: 1.10 },
+  { id: 'd39', name: 'Père Fwetar',         boss: 'Père Fwetar',         level: 200, category: 'Pandore',          difficulty: 'Difficile', imageUrl: '', imageZoom: 1.10 },
+];
+
+function loadDungeons() {
+  const raw = localStorage.getItem(DUNGEONS_KEY);
+  if (!raw) {
+    const d = DEFAULT_DUNGEONS;
+    saveDungeons(d);
+    return d;
+  }
+  return JSON.parse(raw);
+}
+
+function saveDungeons(d) {
+  localStorage.setItem(DUNGEONS_KEY, JSON.stringify(d));
+}
+
+function loadPasseurs() {
+  const raw = localStorage.getItem(PASSEURS_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+
+function savePasseurs(p) {
+  localStorage.setItem(PASSEURS_KEY, JSON.stringify(p));
+}
+
+let dungeons = loadDungeons();
+let passeurs = loadPasseurs();
+let currentSort = 'dungeon';
+let sortDir = 1;
+
+// ===================== FORMAT =====================
+
+function formatKamas(n) {
+  if (!n && n !== 0) return '';
+  if (n === 0) return '0 K';
+  const str = Math.round(n).toString();
+  const parts = [];
+  for (let i = str.length; i > 0; i -= 3) {
+    parts.unshift(str.slice(Math.max(0, i - 3), i));
+  }
+  return parts.join(' ') + ' K';
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+}
+
+function uid() {
+  return 'id_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+}
+
+// ===================== RENDER TABLE =====================
+
+function getDiffClass(diff) {
+  const map = { 'Facile': 'diff-easy', 'Moyen': 'diff-medium', 'Difficile': 'diff-hard', 'Extrême': 'diff-extreme' };
+  return map[diff] || 'diff-medium';
+}
+
+function getPriceClass(price, minPrice) {
+  if (!price) return 'price-empty';
+  if (price === minPrice) return 'price-cheapest';
+  const ratio = price / minPrice;
+  if (ratio <= 1.2) return 'price-cheap';
+  if (ratio <= 1.8) return 'price-mid';
+  return 'price-expensive';
+}
+
+function renderTable() {
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const filterDiff = document.getElementById('filterDifficulty').value;
+  const filterCat = document.getElementById('filterCategory').value;
+  const sortMode = document.getElementById('sortBy').value;
+
+  // Build rows: each passeur entry merged with dungeon info
+  let rows = [];
+
+  // For each dungeon, get all passeurs
+  const dungeonMap = {};
+  dungeons.forEach(d => { dungeonMap[d.id] = d; });
+
+  // Group passeurs by dungeon
+  const byDungeon = {};
+  dungeons.forEach(d => { byDungeon[d.id] = []; });
+  passeurs.forEach(p => {
+    if (byDungeon[p.dungeonId] !== undefined) byDungeon[p.dungeonId].push(p);
+  });
+
+  // Find cheapest per dungeon
+  const cheapestPerDungeon = {};
+  Object.keys(byDungeon).forEach(did => {
+    const ps = byDungeon[did].filter(p => p.price > 0);
+    if (ps.length) {
+      cheapestPerDungeon[did] = Math.min(...ps.map(p => p.price));
+    }
+  });
+
+  // Build row objects
+  dungeons.forEach(d => {
+    const ps = byDungeon[d.id];
+    if (ps.length === 0) {
+      rows.push({ dungeon: d, passeur: null, isCheapest: false });
+    } else {
+      ps.forEach(p => {
+        const isCheapest = p.price > 0 && p.price === cheapestPerDungeon[d.id];
+        rows.push({ dungeon: d, passeur: p, isCheapest });
+      });
+    }
+  });
+
+  // Filter
+  rows = rows.filter(row => {
+    const d = row.dungeon;
+    const p = row.passeur;
+    if (filterDiff && d.difficulty !== filterDiff) return false;
+    if (filterCat && d.category !== filterCat) return false;
+    if (search) {
+      const haystack = [
+        d.name, d.boss, d.category,
+        p ? p.pseudo : '', p ? p.notes : ''
+      ].join(' ').toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+
+  // Sort
+  const sf = sortMode || currentSort;
+  rows.sort((a, b) => {
+    switch (sf) {
+      case 'dungeon': return a.dungeon.name.localeCompare(b.dungeon.name);
+      case 'boss': return a.dungeon.boss.localeCompare(b.dungeon.boss);
+      case 'level': return b.dungeon.level - a.dungeon.level;
+      case 'difficulty': {
+        const o = { 'Facile': 0, 'Moyen': 1, 'Difficile': 2, 'Extrême': 3 };
+        return (o[b.dungeon.difficulty] || 0) - (o[a.dungeon.difficulty] || 0);
+      }
+      case 'pseudo': {
+        const pa = a.passeur ? a.passeur.pseudo : '';
+        const pb = b.passeur ? b.passeur.pseudo : '';
+        return pa.localeCompare(pb);
+      }
+      case 'price_asc': {
+        const pa = a.passeur && a.passeur.price ? a.passeur.price : Infinity;
+        const pb = b.passeur && b.passeur.price ? b.passeur.price : Infinity;
+        return pa - pb;
+      }
+      case 'price_desc': {
+        const pa = a.passeur && a.passeur.price ? a.passeur.price : 0;
+        const pb = b.passeur && b.passeur.price ? b.passeur.price : 0;
+        return pb - pa;
+      }
+      case 'updated': {
+        const pa = a.passeur ? a.passeur.updatedAt : '';
+        const pb = b.passeur ? b.passeur.updatedAt : '';
+        return pb.localeCompare(pa);
+      }
+      default: return 0;
+    }
+  });
+
+  // Render
+  const tbody = document.getElementById('tableBody');
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="10">
+      <div class="empty-state">
+        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <h3>Aucun résultat</h3>
+        <p>Modifie ta recherche ou <span class="empty-add" onclick="openPasseurModal()">ajoute un passeur</span></p>
+      </div>
+    </td></tr>`;
+  } else {
+    tbody.innerHTML = rows.map(row => renderRow(row)).join('');
+  }
+
+  document.getElementById('tableCount').textContent = rows.length + ' entrée' + (rows.length > 1 ? 's' : '');
+  updateDashboard();
+}
+
+function renderRow(row) {
+  const { dungeon: d, passeur: p, isCheapest } = row;
+  const diffClass = getDiffClass(d.difficulty);
+
+  let priceCell, pseudoCell, notesCell, dateCell, actionsCell;
+
+  if (!p) {
+    priceCell = `<span class="price-cell price-empty">— Aucun passeur</span>`;
+    pseudoCell = `<span style="color:var(--text-muted);font-style:italic;font-size:12px;">—</span>`;
+    notesCell = `<span style="color:var(--text-muted);">—</span>`;
+    dateCell = `<span class="td-date">—</span>`;
+    actionsCell = `<button class="btn btn-primary btn-sm" onclick="openPasseurModalForDungeon('${d.id}')">+ Ajouter</button>`;
+  } else {
+    const minPrice = p.price; 
+    const priceClass = isCheapest ? 'price-cheapest' : (p.price ? getPriceClass(p.price, p.price) : 'price-empty');
+    const priceClassActual = p.price ? (isCheapest ? 'price-cheapest' : (() => {
+      const ps = passeurs.filter(x => x.dungeonId === d.id && x.price > 0);
+      const mn = ps.length ? Math.min(...ps.map(x => x.price)) : null;
+      if (!mn) return 'price-empty';
+      return getPriceClass(p.price, mn);
+    })()) : 'price-empty';
+
+    const crown = isCheapest ? '🪙 ' : '';
+    priceCell = p.price
+      ? `<span class="price-cell ${priceClassActual}">${crown}${formatKamas(p.price)}</span>`
+      : `<span class="price-cell price-empty">Non renseigné</span>`;
+    pseudoCell = `<span class="td-pseudo">${escHtml(p.pseudo)}</span>`;
+    notesCell = `<span class="td-notes" title="${escHtml(p.notes || '')}">${escHtml(p.notes || '—')}</span>`;
+    dateCell = `<span class="td-date">${formatDate(p.updatedAt)}</span>`;
+    actionsCell = `
+      <button class="btn btn-warning btn-sm btn-icon" onclick="openEditPasseur('${p.id}')" title="Modifier">✏️</button>
+      <button class="btn btn-danger btn-sm btn-icon" onclick="confirmDeletePasseur('${p.id}')" title="Supprimer">🗑</button>
+    `;
+  }
+
+const rowClass = isCheapest ? 'cheapest-row' : '';
+
+const zoom = d.imageZoom || 1;
+
+const bossImg = d.imageUrl
+  ? `<div style="width:36px;height:36px;border-radius:7px;
+                 background:var(--bg-input);border:1px solid var(--border);
+                 display:flex;align-items:center;justify-content:center;
+                 overflow:hidden;flex-shrink:0;">
+        <img src="${escHtml(d.imageUrl)}" alt="${escHtml(d.boss)}"
+             style="width:100%;height:100%;object-fit:contain;
+                    transform:scale(${zoom});
+                    transform-origin:center center;
+                    transition:transform 0.2s ease;"
+             onerror="this.parentElement.replaceWith(makeBossPlaceholder())">
+     </div>`
+  : `<div style="width:36px;height:36px;border-radius:7px;background:var(--bg-input);
+                   border:1px solid var(--border);display:flex;align-items:center;
+                   justify-content:center;flex-shrink:0;font-size:16px;">⚔️</div>`;
+
+return `<tr class="${rowClass}">
+    <td>
+      <div style="display:flex;align-items:center;gap:10px;">
+        ${bossImg}
+        <div>
+          <div class="td-dungeon">${escHtml(d.name)}</div>
+          <div style="display:flex;gap:5px;margin-top:4px;">
+            <button class="btn btn-secondary btn-sm" style="padding:2px 6px;font-size:10px;" onclick="openEditDungeon('${d.id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" style="padding:2px 6px;font-size:10px;" onclick="confirmDeleteDungeon('${d.id}')">🗑</button>
+          </div>
+        </div>
+      </div>
+    </td>
+    <td class="td-boss">${escHtml(d.boss)}</td>
+    <td class="td-level">${d.level}</td>
+    <td><span class="cat-badge">${escHtml(d.category)}</span></td>
+    <td><span class="badge ${diffClass}">${d.difficulty}</span></td>
+    <td>${pseudoCell}</td>
+    <td>${priceCell}</td>
+    <td>${notesCell}</td>
+    <td>${dateCell}</td>
+    <td class="actions-cell">${actionsCell}</td>
+  </tr>`;
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ===================== DASHBOARD =====================
+
+function updateDashboard() {
+  document.getElementById('stat-dungeons').textContent = dungeons.length;
+  document.getElementById('stat-passeurs').textContent = passeurs.length;
+
+  const withPrice = passeurs.filter(p => p.price > 0);
+  if (withPrice.length) {
+    const cheapest = withPrice.reduce((a, b) => a.price < b.price ? a : b);
+    document.getElementById('stat-cheapest').textContent = formatKamas(cheapest.price);
+    const d = dungeons.find(x => x.id === cheapest.dungeonId);
+    document.getElementById('stat-cheapest-dungeon').textContent = d ? d.name + ' — ' + cheapest.pseudo : cheapest.pseudo;
+  } else {
+    document.getElementById('stat-cheapest').textContent = '—';
+    document.getElementById('stat-cheapest-dungeon').textContent = 'aucun passeur';
+  }
+
+  const allDates = passeurs.map(p => p.updatedAt).filter(Boolean).sort().reverse();
+  if (allDates.length) {
+    const last = passeurs.find(p => p.updatedAt === allDates[0]);
+    document.getElementById('stat-lastupdate').textContent = formatDate(allDates[0]);
+    document.getElementById('stat-lastupdate-who').textContent = last ? last.pseudo : '—';
+  } else {
+    document.getElementById('stat-lastupdate').textContent = '—';
+    document.getElementById('stat-lastupdate-who').textContent = '—';
+  }
+}
+
+// ===================== FILTER CATEGORIES =====================
+
+function populateCategories() {
+  const cats = [...new Set(dungeons.map(d => d.category))].sort();
+  const sel = document.getElementById('filterCategory');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">Toutes catégories</option>' +
+    cats.map(c => `<option value="${escHtml(c)}" ${c === prev ? 'selected' : ''}>${escHtml(c)}</option>`).join('');
+
+  // Dungeon select in modal
+  const dsel = document.getElementById('pDungeon');
+  const prevD = dsel.value;
+  dsel.innerHTML = '<option value="">Sélectionner un donjon...</option>' +
+    [...dungeons].sort((a,b) => a.name.localeCompare(b.name))
+      .map(d => `<option value="${d.id}" ${d.id === prevD ? 'selected' : ''}>${escHtml(d.name)}</option>`).join('');
+}
+
+// ===================== SORT =====================
+
+function setSort(col) {
+  if (currentSort === col) sortDir *= -1;
+  else { currentSort = col; sortDir = 1; }
+  document.getElementById('sortBy').value = col;
+  renderTable();
+}
+
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterDifficulty').value = '';
+  document.getElementById('filterCategory').value = '';
+  document.getElementById('sortBy').value = 'dungeon';
+  currentSort = 'dungeon';
+  renderTable();
+}
+
+// ===================== PASSEUR MODAL =====================
+
+function openPasseurModal(editId) {
+  clearForm(['pDungeon', 'pPseudo', 'pPrice', 'pNotes', 'pEditId']);
+  document.getElementById('passeurModalTitle').textContent = 'Ajouter un Passeur';
+  if (editId) {
+    const p = passeurs.find(x => x.id === editId);
+    if (!p) return;
+    document.getElementById('passeurModalTitle').textContent = 'Modifier le Passeur';
+    document.getElementById('pDungeon').value = p.dungeonId;
+    document.getElementById('pPseudo').value = p.pseudo;
+    document.getElementById('pPrice').value = p.price || '';
+    document.getElementById('pNotes').value = p.notes || '';
+    document.getElementById('pEditId').value = p.id;
+  }
+  openModal('passeurModal');
+}
+
+function openPasseurModalForDungeon(dungeonId) {
+  openPasseurModal();
+  document.getElementById('pDungeon').value = dungeonId;
+}
+
+function openEditPasseur(id) { openPasseurModal(id); }
+
+function previewBossImage() {
+  const url = document.getElementById('dImageUrl').value.trim();
+  const preview = document.getElementById('dImagePreview');
+  if (!url) { resetImagePreview(); return; }
+  preview.innerHTML = `<img src="${escHtml(url)}" alt="preview"
+    style="width:100%;height:100%;object-fit:contain;border-radius:7px;"
+    onerror="this.parentElement.innerHTML='<span style=\\'font-size:18px;opacity:0.4;\\'>❌</span>'">`;
+}
+
+function resetImagePreview() {
+  document.getElementById('dImagePreview').innerHTML = `
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:0.3;">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <circle cx="8.5" cy="8.5" r="1.5"/>
+      <polyline points="21 15 16 10 5 21"/>
+    </svg>`;
+}
+
+function fillBossFromDungeon() {
+  const dId = document.getElementById('pDungeon').value;
+  if (!dId) return;
+  const d = dungeons.find(x => x.id === dId);
+  if (d && !document.getElementById('pPseudo').value) {
+    // Just a placeholder hook if auto fill is desired.
+  }
+}
+
+function savePasseur() {
+  const dungeonId = document.getElementById('pDungeon').value;
+  const pseudo = document.getElementById('pPseudo').value.trim();
+  const price = parseFloat(document.getElementById('pPrice').value) || 0;
+  const notes = document.getElementById('pNotes').value.trim();
+  const editId = document.getElementById('pEditId').value;
+
+  if (!dungeonId) { showToast('Sélectionne un donjon', 'error'); return; }
+  if (!pseudo) { showToast('Entre le pseudo du passeur', 'error'); return; }
+
+  if (editId) {
+    const idx = passeurs.findIndex(p => p.id === editId);
+    if (idx !== -1) {
+      passeurs[idx] = { ...passeurs[idx], dungeonId, pseudo, price, notes, updatedAt: new Date().toISOString() };
+      showToast('Passeur modifié ✓', 'success');
+    }
+  } else {
+    passeurs.push({ id: uid(), dungeonId, pseudo, price, notes, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    showToast('Passeur ajouté ✓', 'success');
+  }
+
+  savePasseurs(passeurs);
+  closeModal('passeurModal');
+  renderTable();
+}
+
+function confirmDeletePasseur(id) {
+  const p = passeurs.find(x => x.id === id);
+  if (!p) return;
+  const d = dungeons.find(x => x.id === p.dungeonId);
+  showConfirm(
+    `Supprimer le passeur <strong>${escHtml(p.pseudo)}</strong> pour <strong>${d ? escHtml(d.name) : 'ce donjon'}</strong> ?`,
+    () => { deletePasseur(id); }
+  );
+}
+
+function deletePasseur(id) {
+  passeurs = passeurs.filter(p => p.id !== id);
+  savePasseurs(passeurs);
+  renderTable();
+  showToast('Passeur supprimé', 'info');
+}
+
+// ===================== DUNGEON MODAL =====================
+
+function openDungeonModal(editId) {
+  clearForm(['dName', 'dBoss', 'dLevel', 'dCategory', 'dEditId', 'dImageUrl']);
+  document.getElementById('dDifficulty').value = 'Difficile';
+  document.getElementById('dungeonModalTitle').textContent = 'Ajouter un Donjon';
+  resetImagePreview();
+  if (editId) {
+    const d = dungeons.find(x => x.id === editId);
+    if (!d) return;
+    document.getElementById('dungeonModalTitle').textContent = 'Modifier le Donjon';
+    document.getElementById('dName').value = d.name;
+    document.getElementById('dBoss').value = d.boss;
+    document.getElementById('dLevel').value = d.level;
+    document.getElementById('dCategory').value = d.category;
+    document.getElementById('dDifficulty').value = d.difficulty;
+    document.getElementById('dImageUrl').value = d.imageUrl || '';
+    document.getElementById('dEditId').value = d.id;
+    if (d.imageUrl) previewBossImage();
+  }
+  openModal('dungeonModal');
+}
+
+function openEditDungeon(id) { openDungeonModal(id); }
+
+function saveDungeon() {
+  const name = document.getElementById('dName').value.trim();
+  const boss = document.getElementById('dBoss').value.trim();
+  const level = parseInt(document.getElementById('dLevel').value) || 200;
+  const category = document.getElementById('dCategory').value.trim();
+  const difficulty = document.getElementById('dDifficulty').value;
+  const imageUrl = document.getElementById('dImageUrl').value.trim();
+  const editId = document.getElementById('dEditId').value;
+
+  if (!name) { showToast('Entre le nom du donjon', 'error'); return; }
+  if (!boss) { showToast('Entre le nom du boss', 'error'); return; }
+
+  if (editId) {
+    const idx = dungeons.findIndex(d => d.id === editId);
+    if (idx !== -1) {
+      dungeons[idx] = { ...dungeons[idx], name, boss, level, category, difficulty, imageUrl };
+      showToast('Donjon modifié ✓', 'success');
+    }
+  } else {
+    dungeons.push({ id: uid(), name, boss, level, category, difficulty, imageUrl });
+    showToast('Donjon ajouté ✓', 'success');
+  }
+
+  saveDungeons(dungeons);
+  populateCategories();
+  closeModal('dungeonModal');
+  renderTable();
+}
+
+function confirmDeleteDungeon(id) {
+  const d = dungeons.find(x => x.id === id);
+  if (!d) return;
+  const count = passeurs.filter(p => p.dungeonId === id).length;
+  showConfirm(
+    `Supprimer le donjon <strong>${escHtml(d.name)}</strong> ?${count ? `<br><small style="color:var(--red)">${count} passeur(s) associé(s) seront également supprimés.</small>` : ''}`,
+    () => { deleteDungeon(id); }
+  );
+}
+
+function deleteDungeon(id) {
+  dungeons = dungeons.filter(d => d.id !== id);
+  passeurs = passeurs.filter(p => p.dungeonId !== id);
+  saveDungeons(dungeons);
+  savePasseurs(passeurs);
+  populateCategories();
+  renderTable();
+  showToast('Donjon supprimé', 'info');
+}
+
+// ===================== IMPORT / EXPORT =====================
+
+function exportJSON() {
+  const data = JSON.stringify({ dungeons, passeurs, exportedAt: new Date().toISOString() }, null, 2);
+  download('kourial-passeurs.json', data, 'application/json');
+  showToast('Export JSON téléchargé ✓', 'success');
+}
+
+function exportCSV() {
+  const dungeonMap = {};
+  dungeons.forEach(d => { dungeonMap[d.id] = d; });
+
+  const headers = ['Donjon', 'Boss', 'Niveau', 'Catégorie', 'Difficulté', 'Passeur', 'Prix (kamas)', 'Notes', 'Mise à jour'];
+  const rows = [];
+
+  dungeons.forEach(d => {
+    const ps = passeurs.filter(p => p.dungeonId === d.id);
+    if (ps.length === 0) {
+      rows.push([d.name, d.boss, d.level, d.category, d.difficulty, '', '', '', '']);
+    } else {
+      ps.forEach(p => {
+        rows.push([d.name, d.boss, d.level, d.category, d.difficulty, p.pseudo, p.price || '', p.notes || '', formatDate(p.updatedAt)]);
+      });
+    }
+  });
+
+  const csv = [headers, ...rows].map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+  download('kourial-passeurs.csv', csv, 'text/csv;charset=utf-8;');
+  showToast('Export CSV téléchargé ✓', 'success');
+}
+
+function download(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function openImportModal() {
+  document.getElementById('importJsonText').value = '';
+  document.getElementById('importFileName').textContent = '';
+  switchImportTab('json');
+  openModal('importModal');
+}
+
+function switchImportTab(tab) {
+  document.getElementById('importJsonSection').style.display = tab === 'json' ? '' : 'none';
+  document.getElementById('importFileSection').style.display = tab === 'file' ? '' : 'none';
+  document.getElementById('tabJson').classList.toggle('active', tab === 'json');
+  document.getElementById('tabFile').classList.toggle('active', tab === 'file');
+}
+
+function loadImportFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('importFileName').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = ev => { document.getElementById('importJsonText').value = ev.target.result; switchImportTab('json'); };
+  reader.readAsText(file);
+}
+
+function doImport() {
+  const raw = document.getElementById('importJsonText').value.trim();
+  if (!raw) { showToast('Aucune donnée à importer', 'error'); return; }
+  try {
+    const data = JSON.parse(raw);
+    if (!data.dungeons || !data.passeurs) throw new Error('Format invalide');
+    dungeons = data.dungeons;
+    passeurs = data.passeurs;
+    saveDungeons(dungeons);
+    savePasseurs(passeurs);
+    populateCategories();
+    renderTable();
+    closeModal('importModal');
+    showToast(`Import réussi: ${dungeons.length} donjons, ${passeurs.length} passeurs ✓`, 'success');
+  } catch (e) {
+    showToast('Erreur: ' + e.message, 'error');
+  }
+}
+
+// ===================== MODAL UTILS =====================
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function clearForm(ids) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.tagName === 'SELECT') el.value = '';
+    else el.value = '';
+  });
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal(overlay.id);
+  });
+});
+
+// ESC key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(el => closeModal(el.id));
+  }
+});
+
+// ===================== CONFIRM MODAL =====================
+
+let confirmCallback = null;
+
+function showConfirm(text, cb) {
+  document.getElementById('confirmText').innerHTML = text;
+  confirmCallback = cb;
+  openModal('confirmModal');
+}
+
+document.getElementById('confirmBtn').onclick = function() {
+  if (confirmCallback) confirmCallback();
+  confirmCallback = null;
+  closeModal('confirmModal');
+};
+
+// ===================== TOAST =====================
+
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${msg}</span>`;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(20px)';
+    el.style.transition = 'all 0.3s';
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
+}
+
+// ===================== PREMIUM MUSIC PLAYER ENGINE =====================
+
+const builtInPlaylist = [
+  {
+    title: "Amakna Village",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Amakna%20Village.mp3"
+  },
+  {
+    title: "Amakna, là où tout commence",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Amaknalaoutoutcommence.mp3"
+  },
+  {
+    title: "Au bibliotemple",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Au%20bibliotemple.mp3"
+  },
+  {
+    title: "Aux portes du Krosmoz",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Aux%20portes%20du%20Krosmoz.mp3"
+  },
+  {
+    title: "Bonta réminiscence",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Bonta%20r%C3%A9miniscence.mp3"
+  },
+  {
+    title: "Bonta, l'angélique",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/main/dofus-music/Bonta%20langelique.mp3"
+  },
+  {
+    title: "Brakmar, la diabolique",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/main/dofus-music/Brakmar%20la%20diabolique.mp3"
+  },
+  {
+    title: "Brakmar, la maléfique",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/main/dofus-music/Brakmar%20la%20malefique.mp3"
+  },
+  {
+    title: "D'Astrub à Incarnam",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/D%27Astrub%20%C3%A0%20Incarnam.mp3"
+  },
+  {
+    title: "Feudala",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Feudala.mp3"
+  },
+  {
+    title: "Frigost, la boréale",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Frigost%2C%20la%20bor%C3%A9ale.mp3"
+  },
+  {
+    title: "Frigost, la marmoréenne",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Frigost%2C%20la%20marmor%C3%A9enne.mp3"
+  },
+  {
+    title: "Guerre, de l'éliocalypse",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Guerre%2C%20de%20l%27%C3%A9liocalypse.mp3"
+  },
+  {
+    title: "Incarnam, la sérafique",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Incarnam%2C%20la%20s%C3%A9rafique.mp3"
+  },
+  {
+    title: "L'île d'Albuera",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/L%27%C3%AEle%20d%27Albuera.mp3"
+  },
+  {
+    title: "L'île d'Ephedrya",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/L%27%C3%AEle%20d%27Ephedrya.mp3"
+  },
+  {
+    title: "L'île d'Otomaï",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/L%27%C3%AEle%20d%27Otoma%C3%AF.mp3"
+  },
+  {
+    title: "L'île de Crocuzko",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/L%27%C3%AEle%20de%20Crocuzko.mp3"
+  },
+  {
+    title: "L'île de Vulkania",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/L%27%C3%AEle%20de%20Vulkania.mp3"
+  },
+  {
+    title: "L'île des wabbits",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/L%27%C3%AEle%20des%20wabbits.mp3"
+  },
+  {
+    title: "La foire du trool",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/La%20foire%20du%20trool.mp3"
+  },
+  {
+    title: "La montagne des Koalaks",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/La%20montagne%20des%20Koalaks.mp3"
+  },
+  {
+    title: "La seconde plantation",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/La%20seconde%20plantation.mp3"
+  },
+  {
+    title: "Le belvédère d'Ilyzaelle",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Le%20belv%C3%A9d%C3%A8re%20d%27Ilyzaelle.mp3"
+  },
+  {
+    title: "Le château de Belladone",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Le%20ch%C3%A2teau%20de%20Belladone.mp3"
+  },
+  {
+    title: "Les champs de Cania",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20champs%20de%20Cania.mp3"
+  },
+  {
+    title: "Les cimes de Cania",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20cimes%20de%20Cania.mp3"
+  },
+  {
+    title: "Les dunes du Saharach",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20dunes%20du%20Saharach.mp3"
+  },
+  {
+    title: "Les marécages d'Amakna",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20mar%C3%A9cages%20d%27Amakna.mp3"
+  },
+  {
+    title: "Les massifs d'Albuera",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20massifs%20d%27Albuera.mp3"
+  },
+  {
+    title: "Les montagnes d'Amakna",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20montagnes%20d%27Amakna.mp3"
+  },
+  {
+    title: "Les plaines d'Amakna",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20plaines%20d%27Amakna.mp3"
+  },
+  {
+    title: "Les prairies de Cania",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20prairies%20de%20Cania.mp3"
+  },
+  {
+    title: "Les ravageurs",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20ravageurs.mp3"
+  },
+  {
+    title: "Les rues d'Amakna",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20rues%20d%27Amakna.mp3"
+  },
+  {
+    title: "Les steppes de Frigost",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20steppes%20de%20Frigost.mp3"
+  },
+  {
+    title: "Les séracs de Frigost",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Les%20s%C3%A9racs%20de%20Frigost.mp3"
+  },
+  {
+    title: "Misère, de l'éliocalypse",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Mis%C3%A8re%2C%20de%20l%27%C3%A9liocalypse.mp3"
+  },
+  {
+    title: "Pandala - Aerdala",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Pandala%20-%20Aerdala.mp3"
+  },
+  {
+    title: "Pandala -Akwadala",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Pandala%20-Akwadala.mp3"
+  },
+  {
+    title: "Pandala, l'euphorique",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Pandala%2C%20l%27euphorique.mp3"
+  },
+  {
+    title: "Plantala",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Plantala.mp3"
+  },
+  {
+    title: "Repos éternel",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Repos%20%C3%A9ternel.mp3"
+  },
+  {
+    title: "Servitude, de l'éliocalypse",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Servitude%2C%20de%20l%27%C3%A9liocalypse.mp3"
+  },
+  {
+    title: "Sidimote infernale",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Sidimote%20infernale.mp3"
+  },
+  {
+    title: "Sufokia la balnéaire",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Sufokia%20la%20baln%C3%A9aire.mp3"
+  },
+  {
+    title: "Sufokia la maritime",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Sufokia%20la%20maritime.mp3"
+  },
+  {
+    title: "Terrdala",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Terrdala.mp3"
+  },
+  {
+    title: "Une forêt bucolique",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Une%20for%C3%AAt%20bucolique.mp3"
+  },
+  {
+    title: "Une forêt malsaine",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Une%20for%C3%AAt%20malsaine.mp3"
+  },
+  {
+    title: "Wukin et Wukang",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/Wukin%20et%20Wukang.mp3"
+  },
+  {
+    title: "l'île de Moon",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/l%27%C3%AEle%20de%20Moon.mp3"
+  },
+  {
+    title: "la vallée de la Mork'Hitu",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/la%20vall%C3%A9e%20de%20la%20Mork%27Hitu.mp3"
+  },
+  {
+    title: "les cavernes d'Ereboria",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/les%20cavernes%20d%27Ereboria.mp3"
+  },
+  {
+    title: "les landes de Sidimote",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/les%20landes%20de%20Sidimote.mp3"
+  },
+  {
+    title: "les plages d'Ereboria",
+    artist: "Dofus OST",
+    url: "https://raw.githubusercontent.com/cinkayNFT/Dosseur/bd97ad2663b4c45a2fe4d897c33515269255d21a/dofus-music/les%20plages%20d%27Ereboria.mp3"
+  }
+];
+
+let activeTrackIndex = 0;
+let isPlaying = false;
+let isMuted = false;
+let isLooping = false;
+let isShuffled = false;
+let previousVolume = 0.6;
+
+// HTML Elements Cache
+const elAudio = document.getElementById('main-audio');
+const elPlayBtn = document.getElementById('player-play-btn');
+const elPlayBtnIcon = document.getElementById('play-btn-icon');
+const elTimeline = document.getElementById('player-timeline');
+const elTimelineProgress = document.getElementById('player-timeline-progress');
+const elTimeCurrent = document.getElementById('player-time-current');
+const elTimeDuration = document.getElementById('player-time-duration');
+const elTrackTitle = document.getElementById('now-playing-title');
+const elTrackArtist = document.getElementById('now-playing-artist');
+const elVolumeSlider = document.getElementById('player-volume-slider');
+const elMuteBtn = document.getElementById('player-mute');
+const elMuteIcon = document.getElementById('player-mute-icon');
+const elPlayerDisk = document.getElementById('player-disk');
+const elPlayerIcon = document.getElementById('player-icon');
+const elLoopBtn = document.getElementById('player-loop');
+const elShuffleBtn = document.getElementById('player-shuffle');
+const elPrevBtn = document.getElementById('player-prev');
+const elNextBtn = document.getElementById('player-next');
+
+const elPlaylistModal = document.getElementById('playlist-modal');
+const elPlaylistContainer = document.getElementById('playlist-container');
+const elOpenPlaylistBtn = document.getElementById('open-playlist-btn');
+const elClosePlaylistBtn = document.getElementById('close-playlist-btn');
+const elPlaylistSearch = document.getElementById('playlist-search');
+
+// Init Player settings from localStorage
+function initMusicPlayer() {
+  // Volume Setting
+  const savedVolume = localStorage.getItem('kpt_player_volume');
+  const initialVolume = savedVolume !== null ? parseFloat(savedVolume) : 0.6;
+  elAudio.volume = initialVolume;
+  elVolumeSlider.value = initialVolume;
+  updateVolumeIcon(initialVolume);
+
+  // Track Index Setting
+  const savedIndex = localStorage.getItem('kpt_player_track_index');
+  activeTrackIndex = savedIndex !== null ? parseInt(savedIndex, 10) : 0;
+  if (activeTrackIndex < 0 || activeTrackIndex >= builtInPlaylist.length) {
+    activeTrackIndex = 0;
+  }
+
+  // Shuffle & Loop Setting
+  isShuffled = localStorage.getItem('kpt_player_shuffle') === 'true';
+  isLooping = localStorage.getItem('kpt_player_loop') === 'true';
+  
+  if (isShuffled) elShuffleBtn.classList.add('active');
+  if (isLooping) elLoopBtn.classList.add('active');
+
+  // Load Track (without autoplay)
+  loadTrack(activeTrackIndex, false);
+
+  // Seek position on initial load
+  const savedPosition = localStorage.getItem('kpt_player_position');
+  if (savedPosition !== null) {
+    const pos = parseFloat(savedPosition);
+    elAudio.addEventListener('loadedmetadata', function onMetadata() {
+      elAudio.currentTime = pos;
+      elAudio.removeEventListener('loadedmetadata', onMetadata);
+    });
+  }
+
+  renderPlaylist();
+}
+
+function loadTrack(index, playAfterLoad = false) {
+  if (builtInPlaylist.length === 0) return;
+  activeTrackIndex = index;
+  localStorage.setItem('kpt_player_track_index', index);
+
+  const track = builtInPlaylist[index];
+  elAudio.src = track.url;
+  elAudio.load();
+
+  elTrackTitle.textContent = track.title;
+  elTrackArtist.textContent = track.artist;
+
+  elTimelineProgress.style.width = '0%';
+  elTimeCurrent.textContent = '0:00';
+
+  if (playAfterLoad) {
+    elAudio.play()
+      .then(() => {
+        isPlaying = true;
+        updatePlaybackUI();
+      })
+      .catch(err => {
+        console.log("Lecture auto bloquée par le navigateur:", err);
+      });
+  } else {
+    isPlaying = false;
+    updatePlaybackUI();
+  }
+
+  renderPlaylist();
+}
+
+function updatePlaybackUI() {
+  if (isPlaying) {
+    elPlayBtnIcon.className = 'fa-solid fa-pause';
+    elPlayerDisk.classList.add('playing');
+    elPlayerIcon.classList.add('fa-spin');
+  } else {
+    elPlayBtnIcon.className = 'fa-solid fa-play';
+    elPlayBtnIcon.style.marginLeft = '2px';
+    elPlayerDisk.classList.remove('playing');
+    elPlayerIcon.classList.remove('fa-spin');
+  }
+}
+
+function togglePlay() {
+  if (isPlaying) {
+    elAudio.pause();
+    isPlaying = false;
+    updatePlaybackUI();
+  } else {
+    elAudio.play()
+      .then(() => {
+        isPlaying = true;
+        updatePlaybackUI();
+      })
+      .catch(err => {
+        showToast("Veuillez cliquer sur la page pour autoriser la lecture audio.", "info");
+      });
+  }
+}
+
+function nextTrack() {
+  if (isShuffled && builtInPlaylist.length > 1) {
+    let rand;
+    do {
+      rand = Math.floor(Math.random() * builtInPlaylist.length);
+    } while (rand === activeTrackIndex);
+    loadTrack(rand, true);
+  } else {
+    const nextIdx = (activeTrackIndex + 1) % builtInPlaylist.length;
+    loadTrack(nextIdx, true);
+  }
+}
+
+function prevTrack() {
+  const prevIdx = (activeTrackIndex - 1 + builtInPlaylist.length) % builtInPlaylist.length;
+  loadTrack(prevIdx, true);
+}
+
+function updateVolumeIcon(val) {
+  if (val === 0) {
+    elMuteIcon.className = 'fa-solid fa-volume-xmark';
+  } else if (val < 0.4) {
+    elMuteIcon.className = 'fa-solid fa-volume-low';
+  } else {
+    elMuteIcon.className = 'fa-solid fa-volume-high';
+  }
+}
+
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderPlaylist() {
+  elPlaylistContainer.innerHTML = '';
+  const searchVal = elPlaylistSearch.value.toLowerCase().trim();
+
+  builtInPlaylist.forEach((track, index) => {
+    // Filter by search
+    if (searchVal && !track.title.toLowerCase().includes(searchVal) && !track.artist.toLowerCase().includes(searchVal)) {
+      return;
+    }
+
+    const isActive = index === activeTrackIndex;
+    const trackItem = document.createElement('div');
+    trackItem.className = `playlist-item ${isActive ? 'active' : ''}`;
+    trackItem.innerHTML = `
+      <div class="playlist-item-info">
+        <div class="playlist-item-title">${escapeHTML(track.title)}</div>
+        <div class="playlist-item-artist">${escapeHTML(track.artist)}</div>
+      </div>
+      ${isActive ? '<i class="fa-solid fa-volume-high playlist-item-icon"></i>' : ''}
+    `;
+
+    trackItem.addEventListener('click', () => {
+      loadTrack(index, true);
+    });
+
+    elPlaylistContainer.appendChild(trackItem);
+  });
+}
+
+// Player Action Event Listeners
+elPlayBtn.addEventListener('click', togglePlay);
+elNextBtn.addEventListener('click', nextTrack);
+elPrevBtn.addEventListener('click', prevTrack);
+
+elLoopBtn.addEventListener('click', () => {
+  isLooping = !isLooping;
+  localStorage.setItem('kpt_player_loop', isLooping);
+  elLoopBtn.classList.toggle('active', isLooping);
+  showToast(isLooping ? "Répétition activée" : "Répétition désactivée", "info");
+});
+
+elShuffleBtn.addEventListener('click', () => {
+  isShuffled = !isShuffled;
+  localStorage.setItem('kpt_player_shuffle', isShuffled);
+  elShuffleBtn.classList.toggle('active', isShuffled);
+  showToast(isShuffled ? "Lecture aléatoire activée" : "Lecture aléatoire désactivée", "info");
+});
+
+elMuteBtn.addEventListener('click', () => {
+  if (isMuted) {
+    elAudio.volume = previousVolume;
+    elVolumeSlider.value = previousVolume;
+    updateVolumeIcon(previousVolume);
+    isMuted = false;
+  } else {
+    previousVolume = elAudio.volume > 0 ? elAudio.volume : 0.6;
+    elAudio.volume = 0;
+    elVolumeSlider.value = 0;
+    elMuteIcon.className = 'fa-solid fa-volume-xmark';
+    isMuted = true;
+  }
+});
+
+elVolumeSlider.addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  elAudio.volume = val;
+  localStorage.setItem('kpt_player_volume', val);
+  updateVolumeIcon(val);
+  isMuted = val === 0;
+});
+
+// Seek timeline positioning
+elTimeline.addEventListener('click', (e) => {
+  const rect = elTimeline.getBoundingClientRect();
+  const clickPosition = (e.clientX - rect.left) / rect.width;
+  if (elAudio.duration) {
+    elAudio.currentTime = clickPosition * elAudio.duration;
+  }
+});
+
+// Audio updates timeline bar
+elAudio.addEventListener('timeupdate', () => {
+  const current = elAudio.currentTime;
+  const duration = elAudio.duration || 0;
+
+  // Persistence update throttled roughly
+  if (current > 0) {
+    localStorage.setItem('kpt_player_position', current);
+  }
+
+  if (duration > 0) {
+    const progressPercent = (current / duration) * 100;
+    elTimelineProgress.style.width = `${progressPercent}%`;
+
+    const currentMins = Math.floor(current / 60);
+    const currentSecs = Math.floor(current % 60).toString().padStart(2, '0');
+    const durationMins = Math.floor(duration / 60);
+    const durationSecs = Math.floor(duration % 60).toString().padStart(2, '0');
+
+    elTimeCurrent.textContent = `${currentMins}:${currentSecs}`;
+    elTimeDuration.textContent = `${durationMins}:${durationSecs}`;
+  }
+});
+
+// Track progression rules when track ends
+elAudio.addEventListener('ended', () => {
+  if (isLooping) {
+    elAudio.currentTime = 0;
+    elAudio.play().catch(() => {});
+  } else {
+    nextTrack();
+  }
+});
+
+// Playlist Modal Toggle
+elOpenPlaylistBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const isHidden = window.getComputedStyle(elPlaylistModal).display === 'none';
+  elPlaylistModal.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    renderPlaylist();
+  }
+});
+
+elClosePlaylistBtn.addEventListener('click', () => {
+  elPlaylistModal.style.display = 'none';
+});
+
+// Search playlist input live filter
+elPlaylistSearch.addEventListener('input', renderPlaylist);
+
+// Prevent popup click from closing
+elPlaylistModal.addEventListener('click', (e) => {
+  e.stopPropagation();
+});
+
+document.addEventListener('click', () => {
+  elPlaylistModal.style.display = 'none';
+});
+
+// ===================== INIT RUNNER =====================
+
+function init() {
+  populateCategories();
+  renderTable();
+  initMusicPlayer();
+}
+
+init();
+</script>
+</body>
+</html>
